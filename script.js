@@ -1,8 +1,8 @@
 /*
  * @Author: BanHua
  * @Date: 2021-01-12 23:10:12
- * @LastEditors: BanHua
- * @LastEditTime: 2021-01-13 15:24:05
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2021-01-14 01:36:47
  * @Description: file content
  */
 
@@ -15,7 +15,11 @@ let xx密码 = storage.get('viewDataArr')['bh_xx_pass'];
 let 功能1 = storage.get('viewDataArr')['bh_gn1'];
 
 console.show();
-console.info(xx帐号);
-console.info(xx密码);
+
 console.info(功能1);
 
+
+while (1) {
+    console.info(xx帐号);
+    console.info(xx密码);
+}

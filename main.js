@@ -1,8 +1,8 @@
 /*
  * @Author: BanHua
  * @Date: 2021-01-04 12:37:17
- * @LastEditors: BanHua
- * @LastEditTime: 2021-01-13 14:08:04
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2021-01-14 01:37:47
  * @Description: file content
  */
 
@@ -12,9 +12,10 @@
 const CONFIG = {
     "jgyPath": "TaoBao/BanHua2.1/",
     "jgyUser": "17685034710@163.com",
-    "jgyKey": "awn775w5xg9nnzmj",
+    "jgyKey": "axtpjmwwx9w95fyk",
     "storageName": "BanHua"
 }
+
 
 
 //                            _ooOoo_
@@ -144,15 +145,11 @@ let sJgyFile = null;
 
 //开始获取坚果云文件线程
 let oGetJgyFileThreads = threads.start(function() {
-    let _jgyStr = GetJgyFile(CONFIG.jgyUser, CONFIG.jgyKey, CONFIG.jgyPath+"mainActivity.js");
+    sJgyFile = GetJgyFile(CONFIG.jgyUser, CONFIG.jgyKey, CONFIG.jgyPath+"mainActivity.js");
     // console.log(_jgyStr);
 
-    if (_jgyStr != null) {
-        // console.log('后端文件获取成功');
-        sJgyFile = _jgyStr;
-        
-    } else {
-        toastLog('后端文件获取失败！');
+    if (sJgyFile == null) {
+        console.error('mainActivity文件获取失败');
         exit();
     }
     

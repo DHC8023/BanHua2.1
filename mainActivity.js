@@ -1,8 +1,8 @@
 /*
  * @Author: BanHua
  * @Date: 2021-01-05 14:06:06
- * @LastEditors: BanHua
- * @LastEditTime: 2021-01-13 15:19:22
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2021-01-14 01:37:39
  * @Description: file content
  */
 /**
@@ -175,17 +175,18 @@ ui.start.on('click', ()=> {
                 if (window.scriptState.getText() == '开始') {
                     log('execution:' + execution);
                     //开始获取云端的脚本资源
-                    let _jgyStr = GetJgyFile(CONFIG.jgyUser, CONFIG.jgyKey, CONFIG.jgyPath+"script.js");
-                    // console.log(_jgyStr);
+                    let _scriptFile = null;
+                    let _GetJgyFileTh = threads.start(function(){
+                        _scriptFile = GetJgyFile(CONFIG.jgyUser, CONFIG.jgyKey, CONFIG.jgyPath+"script.js");
+                        if (_scriptFile == null) {
+                            console.error('script文件获取失败');
+                            exit();
+                        }
+                    });
+
+                    while(_GetJgyFileTh.isAlive());
                 
-                    if (_jgyStr != null) {
-                        // console.log('后端文件获取成功');
-                        sJgyFile = _jgyStr;
-                    } else {
-                        toastLog('script脚本文件获取失败！');
-                        exit();
-                    }
-                    execution = engines.execScript('BHscript', _jgyStr);
+                    execution = engines.execScript('BHscript', _scriptFile);
                     window.windowButton.setSource('@drawable/ic_pause_circle_outline_black_48dp');
                     window.scriptState.setText('停止');
     

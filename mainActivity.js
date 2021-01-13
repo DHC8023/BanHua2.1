@@ -2,7 +2,7 @@
  * @Author: BanHua
  * @Date: 2021-01-05 14:06:06
  * @LastEditors: BanHua
- * @LastEditTime: 2021-01-13 13:24:08
+ * @LastEditTime: 2021-01-13 13:43:30
  * @Description: file content
  */
 /**
@@ -79,90 +79,98 @@ ui.deBugService.on('click', ()=> {
 
 //创建脚本进程变量
 var execution = null;
-
+var window = null
 //绑定开始按钮单机事件
 ui.start.on('click', ()=> {
-    //开始保存内容到本地储存
-    let icon = '@drawable/ic_play_circle_outline_black_48dp'
-    let scriptThreads = threads.start(function(){
-        getViewContent(xmlStringFindIdAddArray(userUI.toString(), 'bh_'));
-        console.info('保存UI配置数据到本地储存成功！');
-        
-        let window = floaty.window(
-            <frame>
-                <img w="auto" h="auto" src="@drawable/ic_play_circle_outline_black_48dp" id='windowButton'/>
-                <text id='scriptState' text='开始' visibility='gone'></text>
-            </frame>
-        );
-
-        //设置悬浮窗位置
-        window.setPosition(0, device.height/2);
-
-        //记录按键被按下时的触摸坐标
-        var x = 0, y = 0;
-        //记录按键被按下时的悬浮窗位置
-        var windowX, windowY;
-        //记录按键被按下的时间以便判断长按等动作
-        var downTime;
-
-        //监听滑动悬浮窗事件
-        window.windowButton.setOnTouchListener(function(view, event){
-            switch(event.getAction()){
-                case event.ACTION_DOWN:
-                    x = event.getRawX();
-                    y = event.getRawY();
-                    windowX = window.getX();
-                    windowY = window.getY();
-                    downTime = new Date().getTime();
-                    return true;
-                case event.ACTION_MOVE:
-                    //移动手指时调整悬浮窗位置
-                    window.setPosition(windowX + (event.getRawX() - x),
-                        windowY + (event.getRawY() - y));
-                    //如果按下的时间超过1.5秒判断为长按，退出脚本
-                    if(new Date().getTime() - downTime > 1500){
-                        toastLog('长按退出脚本！');
+    if (!window) {
+            scriptThreads = threads.start(function(){
+            auto.waitFor();
+    
+            //开始保存内容到本地储存
+            getViewContent(xmlStringFindIdAddArray(userUI.toString(), 'bh_'));
+            console.info('保存UI配置数据到本地储存成功！');
+            home();
+            
+            window = floaty.window(
+                <frame>
+                    <img w="auto" h="auto" src="@drawable/ic_play_circle_outline_black_48dp" id='windowButton'/>
+                    <text id='scriptState' text='开始' visibility='gone'></text>
+                </frame>
+            );
+    
+            //设置悬浮窗位置
+            window.setPosition(0, device.height/2);
+    
+            //记录按键被按下时的触摸坐标
+            var x = 0, y = 0;
+            //记录按键被按下时的悬浮窗位置
+            var windowX, windowY;
+            //记录按键被按下的时间以便判断长按等动作
+            var downTime;
+    
+            //监听滑动悬浮窗事件
+            window.windowButton.setOnTouchListener(function(view, event){
+                switch(event.getAction()){
+                    case event.ACTION_DOWN:
+                        x = event.getRawX();
+                        y = event.getRawY();
+                        windowX = window.getX();
+                        windowY = window.getY();
+                        downTime = new Date().getTime();
+                        return true;
+                    case event.ACTION_MOVE:
+                        //移动手指时调整悬浮窗位置
+                        window.setPosition(windowX + (event.getRawX() - x),
+                            windowY + (event.getRawY() - y));
+                        //如果按下的时间超过1.5秒判断为长按，退出脚本
+                        if(new Date().getTime() - downTime > 1500){
+                            toastLog('长按退出脚本！');
+                            exit();
+                        }
+                        return true;
+                    case event.ACTION_UP:
+                        //手指弹起时如果偏移很小则判断为点击
+                        if(Math.abs(event.getRawY() - y) < 5 && Math.abs(event.getRawX() - x) < 5){
+                            // toastLog('点击了按钮');
+                            windowButtonClick();
+                        }
+                        return true;
+                }
+                return true;
+            });
+    
+            function windowButtonClick () {
+                if (window.scriptState.getText() == '开始') {
+                    log('execution:' + execution);
+                    //开始获取云端的脚本资源
+                    let _jgyStr = GetJgyFile(CONFIG.jgyUser, CONFIG.jgyKey, CONFIG.jgyPath+"script.js");
+                    // console.log(_jgyStr);
+                
+                    if (_jgyStr != null) {
+                        // console.log('后端文件获取成功');
+                        sJgyFile = _jgyStr;
+                    } else {
+                        toastLog('script脚本文件获取失败！');
                         exit();
                     }
-                    return true;
-                case event.ACTION_UP:
-                    //手指弹起时如果偏移很小则判断为点击
-                    if(Math.abs(event.getRawY() - y) < 5 && Math.abs(event.getRawX() - x) < 5){
-                        // toastLog('点击了按钮');
-                        windowButtonClick();
-                    }
-                    return true;
-            }
-            return true;
-        });
-
-        function windowButtonClick () {
-            if (window.scriptState.getText() == '开始') {
-                //开始获取云端的脚本资源
-                let _jgyStr = GetJgyFile(CONFIG.jgyUser, CONFIG.jgyKey, CONFIG.jgyPath+"script.js");
-                // console.log(_jgyStr);
-            
-                if (_jgyStr != null) {
-                    // console.log('后端文件获取成功');
-                    sJgyFile = _jgyStr;
+                    execution = engines.execScript('BHscript', _jgyStr);
+                    window.windowButton.setSource('@drawable/ic_pause_circle_outline_black_48dp');
+                    window.scriptState.setText('停止');
+    
+    
                 } else {
-                    toastLog('script脚本文件获取失败！');
-                    exit();
+                    if (execution) {
+                        execution.getEngine().forceStop();
+                    }
+                    window.windowButton.setSource('@drawable/ic_play_circle_outline_black_48dp');
+                    window.scriptState.setText('开始');
                 }
-                execution = engines.execScript('BHscript', _jgyStr);
-                window.windowButton.setSource('@drawable/ic_pause_circle_outline_black_48dp');
-                window.scriptState.setText('停止');
-
-            } else {
-                if (execution) {
-                    execution.getEngine().forceStop();
-                }
-                window.windowButton.setSource('@drawable/ic_play_circle_outline_black_48dp');
-                window.scriptState.setText('开始');
             }
-        }
-        
-    });
+        });
+    } else {
+        toastLog('哎呀，不要戳我!!!');
+        home();
+    }
 });
 
 //绑定退出按钮单机事件

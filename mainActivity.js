@@ -2,13 +2,18 @@
  * @Author: BanHua
  * @Date: 2021-01-05 14:06:06
  * @LastEditors: BanHua
- * @LastEditTime: 2021-01-12 23:17:28
+ * @LastEditTime: 2021-01-13 13:24:08
  * @Description: file content
  */
 /**
  * 1.如果需要自定保存控件的值，需要将控件ID以bh_开口进行命名，如bh_delay
  * 
  */
+
+
+importClass(android.content.Intent);
+importClass(android.net.Uri);
+importClass(android.provider.Settings);
 //声明主体颜色
 const COLOR = '#FFD700';
 //声明脚本标题
@@ -51,6 +56,14 @@ setViewContent(xmlStringFindIdAddArray(userUI.toString(), 'bh_'));
 //绑定无障碍服务单机事件
 ui.autoService.on('click', () => {
     ui.autoService.isChecked() ? auto.service == null ? app.startActivity({action: "android.settings.ACCESSIBILITY_SETTINGS"}) : log('无障碍处于打开状态') : auto.service == null ? log('无障碍处于关闭状态') : auto.service.disableSelf();
+});
+
+//绑定悬浮窗权限单机事件
+ui.windowService.on('click', () => {
+    var intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+        Uri.parse("package:" + context.getPackageName()));
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    app.startActivity(intent);
 });
 
 //绑定调试服务单机事件

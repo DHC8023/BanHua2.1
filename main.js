@@ -119,7 +119,6 @@ this.putUiConfig = function (storage) {
     });
 }
 
-
 //设置控件信息
 this.getUiConfig = function (storage, ids) {
     // log("storage:"+storage);
@@ -137,6 +136,11 @@ this.getUiConfig = function (storage, ids) {
             console.error("【%s】该类型的控件不支持设置控件信息", idName);
         }
     });
+}
+
+//script文件获取相关控件信息
+this.getViewContent = function (name) {
+    return this.Config.o_storage.get(name);
 }
 
 //导入mod

@@ -3,5 +3,5 @@ console.show();
 while (1) {
     log('1');
     sleep(1000);
-    log(Config.s_mainActivity);
+    log(getViewContent("bh_user"));
 }
